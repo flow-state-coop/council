@@ -3,16 +3,25 @@ import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 import ConnectWallet from "@/components/ConnectWallet";
 import CreateCoinbaseWallet from "@/components/CreateCoinbaseWallet";
+import CouncilMemberWallet from "@/components/CouncilMemberWallet";
 import Nav from "react-bootstrap/Nav";
 import Stack from "react-bootstrap/Stack";
 import Image from "react-bootstrap/Image";
+import { CouncilMember } from "@/types/councilMember";
 import { useMediaQuery } from "@/hooks/mediaQuery";
+import useCouncil from "@/hooks/council";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { address } = useAccount();
   const { isMobile, isTablet, isSmallScreen, isMediumScreen } = useMediaQuery();
+  const { council } = useCouncil();
+
+  const isCouncilMember = !!council?.councilMembers?.find(
+    (councilMember: CouncilMember) =>
+      councilMember.account === address?.toLowerCase(),
+  );
 
   return (
     <Nav className="w-100 shadow">
@@ -47,7 +56,7 @@ export default function Header() {
           onClick={() => router.push("/")}
         />
         <Stack direction="horizontal" gap={3}>
-          <ConnectWallet />
+          {isCouncilMember ? <CouncilMemberWallet /> : <ConnectWallet />}
           {!address && !isMobile && <CreateCoinbaseWallet />}
         </Stack>
       </Stack>

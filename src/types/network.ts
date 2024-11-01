@@ -7,7 +7,7 @@ export type Network = {
   icon: string;
   rpcUrl: string;
   blockExplorer: string;
-  councilAddress: string;
+  councilAddress: Address;
   councilSubgraph: string;
   superfluidExplorer: string;
   superfluidDashboard: string;

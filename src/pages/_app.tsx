@@ -7,6 +7,7 @@ import { /*base,*/ optimismSepolia } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import { WALLET_CONNECT_PROJECT_ID } from "../lib/constants";
+import { CouncilContextProvider } from "@/context/Council";
 import "@rainbow-me/rainbowkit/styles.css";
 import "@/styles.scss";
 
@@ -29,9 +30,11 @@ export default function App({ Component, pageProps }: AppProps) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider modalSize="compact">
-          <Layout>
-            <Component key={router.asPath} {...pageProps} />
-          </Layout>
+          <CouncilContextProvider>
+            <Layout>
+              <Component key={router.asPath} {...pageProps} />
+            </Layout>
+          </CouncilContextProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

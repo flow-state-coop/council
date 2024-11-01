@@ -13,18 +13,10 @@ export default function Layout({ children }: LayoutProps) {
       <Head>
         <title>Flow State - Making Impact Common</title>
       </Head>
-      <Stack direction="vertical">
+      <Stack direction="vertical" style={{ minHeight: "100vh" }}>
         <Header />
-        <Stack
-          direction="horizontal"
-          className="flex-grow-1"
-          style={{ minHeight: "100vh" }}
-        >
-          <Stack
-            direction="vertical"
-          >
-            {children}
-          </Stack>
+        <Stack direction="horizontal" className="flex-grow-1">
+          <Stack direction="vertical">{children}</Stack>
         </Stack>
         <Footer />
       </Stack>

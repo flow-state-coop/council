@@ -1,15 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { useAccount } from "wagmi";
 import { useInView } from "react-intersection-observer";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Spinner from "react-bootstrap/Spinner";
 import Dropdown from "react-bootstrap/Dropdown";
 import GranteeCard from "@/components/GranteeCard";
+import Ballot from "@/components/Ballot";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import { ProjectMetadata } from "@/types/projectMetadata";
-import { CouncilMember } from "@/types/councilMember";
 import { Grantee, SortingMethod } from "@/types/grantee";
 import useCouncil from "@/hooks/council";
 import { networks } from "@/lib/networks";
@@ -20,7 +19,6 @@ const GRANTEES_BATCH_SIZE = 20;
 
 export default function Index() {
   const [grantees, setGrantees] = useState<Grantee[]>([]);
-  const [councilMembers, setCouncilMembers] = useState<CouncilMember[]>([]);
   const [sortingMethod, setSortingMethod] = useState(SortingMethod.RANDOM);
 
   const skipGrantees = useRef(0);
@@ -37,22 +35,22 @@ export default function Index() {
   const { isMobile, isTablet, isSmallScreen, isMediumScreen, isBigScreen } =
     useMediaQuery();
   const [sentryRef, inView] = useInView();
-  const { council, flowStateProfiles, gdaPool } = useCouncil(network);
-  const { address } = useAccount();
+  const { newAllocation, council, flowStateProfiles, gdaPool } = useCouncil();
 
   const getGrantee = useCallback(
     (recipient: { id: string; address: string; metadata: ProjectMetadata }) => {
       const adjustedFlowRate =
-        BigInt(gdaPool.flowRate) - BigInt(gdaPool.adjustmentFlowRate);
-      const member = gdaPool.poolMembers.find(
+        BigInt(gdaPool?.flowRate ?? 0) -
+        BigInt(gdaPool?.adjustmentFlowRate ?? 0);
+      const member = gdaPool?.poolMembers.find(
         (member: { account: { id: string } }) =>
           member.account.id === recipient.address,
       );
       const memberUnits = member?.units ?? 0;
       const memberFlowRate =
-        BigInt(gdaPool.totalUnits) > 0
+        BigInt(gdaPool?.totalUnits ?? 0) > 0
           ? (BigInt(memberUnits) * adjustedFlowRate) /
-            BigInt(gdaPool.totalUnits)
+            BigInt(gdaPool?.totalUnits ?? 0)
           : BigInt(0);
 
       return {
@@ -170,106 +168,102 @@ export default function Index() {
     sortGrantees,
   ]);
 
-  useEffect(() => {
-    if (council) {
-      setCouncilMembers(
-        council.councilMembers.filter(
-          (councilMember: CouncilMember) => councilMember.enabled,
-        ),
-      );
-    }
-  }, [council]);
-
   return (
-    <Container
-      className="mx-auto p-0 mb-5"
-      style={{
-        maxWidth:
-          isMobile || isTablet
-            ? "100%"
-            : isSmallScreen
-              ? 1000
-              : isMediumScreen
-                ? 1300
-                : 1600,
-      }}
-    >
-      <Stack
-        direction="horizontal"
-        gap={4}
-        className="px-4 pt-5 pb-4 pt-4 fs-4"
-      >
-        Grantees
-        <Dropdown>
-          <Dropdown.Toggle
-            variant="transparent"
-            className="d-flex justify-content-between align-items-center border border-2 border-gray"
-            style={{ width: 156 }}
-          >
-            {sortingMethod}
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item
-              onClick={() => setSortingMethod(SortingMethod.RANDOM)}
-            >
-              {SortingMethod.RANDOM}
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => setSortingMethod(SortingMethod.ALPHABETICAL)}
-            >
-              {SortingMethod.ALPHABETICAL}
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => setSortingMethod(SortingMethod.POPULAR)}
-            >
-              {SortingMethod.POPULAR}
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </Stack>
-      <Stack direction="vertical" className="flex-grow-0">
-        <div
-          className="px-4 pb-5"
-          style={{
-            display: "grid",
-            columnGap: "1.5rem",
-            rowGap: "3rem",
-            gridTemplateColumns: isTablet
-              ? "repeat(2,minmax(0,1fr))"
+    <>
+      <Container
+        className="mx-auto mb-5 p-0"
+        style={{
+          maxWidth:
+            isMobile || isTablet
+              ? "100%"
               : isSmallScreen
-                ? "repeat(3,minmax(0,1fr))"
-                : isMediumScreen || isBigScreen
-                  ? "repeat(4,minmax(0,1fr))"
-                  : "",
-          }}
+                ? 1000
+                : isMediumScreen
+                  ? 1300
+                  : 1600,
+        }}
+      >
+        <Stack
+          direction="horizontal"
+          gap={4}
+          className="px-4 pt-5 pb-4 pt-4 fs-4"
         >
-          {grantees.map((grantee: Grantee) => (
-            <GranteeCard
-              key={grantee.id}
-              id={grantee.id}
-              name={grantee.metadata.title}
-              description={grantee.metadata.description}
-              logoCid={grantee.metadata.logoImg}
-              bannerCid={grantee.bannerCid}
-              placeholderLogo={grantee.placeholderLogo}
-              placeholderBanner={grantee.placeholderBanner}
-              flowRate={grantee.flowRate}
-              units={grantee.units}
-              network={network}
-              isSelected={false}
-            />
-          ))}
-        </div>
-        {hasNextGrantee.current === true && (
-          <Stack
-            direction="horizontal"
-            className="justify-content-center m-auto"
+          Grantees
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="transparent"
+              className="d-flex justify-content-between align-items-center border border-2 border-gray"
+              style={{ width: 156 }}
+            >
+              {sortingMethod}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item
+                onClick={() => setSortingMethod(SortingMethod.RANDOM)}
+              >
+                {SortingMethod.RANDOM}
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => setSortingMethod(SortingMethod.ALPHABETICAL)}
+              >
+                {SortingMethod.ALPHABETICAL}
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => setSortingMethod(SortingMethod.POPULAR)}
+              >
+                {SortingMethod.POPULAR}
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Stack>
+        <Stack direction="vertical" className="flex-grow-0">
+          <div
+            className="px-4 pb-5"
+            style={{
+              display: "grid",
+              columnGap: "1.5rem",
+              rowGap: "3rem",
+              gridTemplateColumns: isTablet
+                ? "repeat(2,minmax(0,1fr))"
+                : isSmallScreen
+                  ? "repeat(3,minmax(0,1fr))"
+                  : isMediumScreen || isBigScreen
+                    ? "repeat(4,minmax(0,1fr))"
+                    : "",
+            }}
           >
-            <Spinner ref={sentryRef}></Spinner>
-          </Stack>
-        )}
-      </Stack>
-    </Container>
+            {grantees.map((grantee: Grantee) => (
+              <GranteeCard
+                key={grantee.id}
+                id={grantee.id}
+                granteeAddress={grantee.address}
+                name={grantee.metadata.title}
+                description={grantee.metadata.description}
+                logoCid={grantee.metadata.logoImg}
+                bannerCid={grantee.bannerCid}
+                placeholderLogo={grantee.placeholderLogo}
+                placeholderBanner={grantee.placeholderBanner}
+                flowRate={grantee.flowRate}
+                units={grantee.units}
+                network={network}
+                isSelected={false}
+              />
+            ))}
+          </div>
+          {hasNextGrantee.current === true && (
+            <Stack
+              direction="horizontal"
+              className="justify-content-center m-auto"
+            >
+              <Spinner ref={sentryRef}></Spinner>
+            </Stack>
+          )}
+        </Stack>
+      </Container>
+      {newAllocation?.showBallot && (
+        <Ballot councilAddress={network.councilAddress} />
+      )}
+    </>
   );
 }

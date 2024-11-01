@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
 import { createVerifiedFetch } from "@helia/verified-fetch";
 import { useClampText } from "use-clamp-text";
 import Stack from "react-bootstrap/Stack";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
-import { roundWeiAmount } from "@/lib/utils";
+import { CouncilMember } from "@/types/councilMember";
 import { Network } from "@/types/network";
+import useCouncil from "@/hooks/council";
+import { roundWeiAmount } from "@/lib/utils";
 import { IPFS_GATEWAYS, SECONDS_IN_MONTH } from "@/lib/constants";
 
 type GranteeProps = {
   id: string;
   name: string;
+  granteeAddress: string;
   description: string;
   logoCid: string;
   bannerCid: string;
@@ -27,6 +31,7 @@ export default function Grantee(props: GranteeProps) {
   const {
     id,
     name,
+    granteeAddress,
     description,
     logoCid,
     bannerCid,
@@ -41,11 +46,28 @@ export default function Grantee(props: GranteeProps) {
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
 
+  const { address } = useAccount();
+  const { newAllocation, council, currentAllocation, dispatchNewAllocation } =
+    useCouncil();
   const [descriptionRef, { noClamp, clampedText }] = useClampText({
     text: description,
     ellipsis: "...",
     lines: 4,
   });
+  const isCouncilMember = !!council?.councilMembers?.find(
+    (councilMember: CouncilMember) =>
+      councilMember.account === address?.toLowerCase(),
+  );
+  const hasAllocated =
+    !!currentAllocation?.allocation?.find(
+      (allocation: { grantee: string }) =>
+        allocation.grantee === granteeAddress,
+    ) ||
+    !!newAllocation?.allocation?.find(
+      (allocation: { grantee: string }) =>
+        allocation.grantee === granteeAddress,
+    );
+
   const monthlyFlow = roundWeiAmount(flowRate * BigInt(SECONDS_IN_MONTH), 4);
 
   useEffect(() => {
@@ -82,13 +104,12 @@ export default function Grantee(props: GranteeProps) {
 
   return (
     <Card
-      className="rounded-4 overflow-hidden cursor-pointer"
+      className="rounded-4 overflow-hidden"
       style={{
         height: 400,
         border: isSelected ? "1px solid #247789" : "1px solid #212529",
         boxShadow: isSelected ? "0px 0px 0px 2px #247789" : "",
       }}
-      onClick={() => void 0}
     >
       <Card.Img
         variant="top"
@@ -143,16 +164,33 @@ export default function Grantee(props: GranteeProps) {
       >
         <Stack
           direction="horizontal"
+          gap={2}
           className="justify-content-end w-100 me-4"
         >
           <Button
             variant="link"
             href={`https://flowstate.network/projects/${id}/?chainId=${network.id}`}
             target="_blank"
-            className="d-flex justify-content-center bg-primary w-33 px-5 text-light"
+            className="d-flex justify-content-center bg-secondary w-33 px-5 text-light"
           >
             <Image src="/open-new.svg" alt="Profile" width={22} height={22} />
           </Button>
+          {isCouncilMember && (
+            <Button
+              disabled={hasAllocated}
+              onClick={() =>
+                dispatchNewAllocation({
+                  type: "add",
+                  allocation: { grantee: granteeAddress, amount: 0 },
+                  currentAllocation,
+                })
+              }
+              className="d-flex justify-content-center align-items-center gap-1 w-33 px-5"
+            >
+              <Image src="/add.svg" alt="Add" width={16} height={16} />
+              <Image src="/cart.svg" alt="Cart" width={22} height={22} />
+            </Button>
+          )}
         </Stack>
       </Card.Footer>
     </Card>

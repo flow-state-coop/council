@@ -8,6 +8,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import GranteeCard from "@/components/GranteeCard";
 import RoundBanner from "@/components/RoundBanner";
 import Ballot from "@/components/Ballot";
+import GranteeApplication from "@/components/GranteeApplication";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import { ProjectMetadata } from "@/types/projectMetadata";
 import { Grantee, SortingMethod } from "@/types/grantee";
@@ -21,6 +22,7 @@ const GRANTEES_BATCH_SIZE = 20;
 export default function Index() {
   const [grantees, setGrantees] = useState<Grantee[]>([]);
   const [sortingMethod, setSortingMethod] = useState(SortingMethod.RANDOM);
+  const [showGranteeApplication, setShowGranteeApplication] = useState(false);
 
   const skipGrantees = useRef(0);
   const granteesBatch = useRef(1);
@@ -189,6 +191,7 @@ export default function Index() {
           description="Flow Council"
           distributionTokenInfo={network.tokens[0]}
           gdaPool={gdaPool}
+          showGranteeApplication={() => setShowGranteeApplication(true)}
         />
         <Stack
           direction="horizontal"
@@ -268,9 +271,14 @@ export default function Index() {
           )}
         </Stack>
       </Container>
-      {newAllocation?.showBallot && (
+      {showGranteeApplication ? (
+        <GranteeApplication
+          network={network}
+          hide={() => setShowGranteeApplication(false)}
+        />
+      ) : newAllocation?.showBallot ? (
         <Ballot councilAddress={network.councilAddress} />
-      )}
+      ) : null}
     </>
   );
 }

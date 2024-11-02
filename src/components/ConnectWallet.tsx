@@ -67,7 +67,7 @@ export default function ConnectWallet() {
                   </Button>
                   <Button
                     variant="transparent"
-                    className="d-flex align-items-center gap-1 border rounded-3 shadow"
+                    className="d-none d-sm-flex align-items-center gap-1 border rounded-3 shadow"
                     onClick={openAccountModal}
                   >
                     <Image

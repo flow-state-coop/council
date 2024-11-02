@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect } from "react";
 import { formatEther } from "viem";
+import { useAccount } from "wagmi";
 import Stack from "react-bootstrap/Stack";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -18,15 +19,23 @@ type PoolInfoProps = {
   description: string;
   distributionTokenInfo: Token;
   gdaPool?: GDAPool;
+  showGranteeApplication: () => void;
 };
 
 export default function PoolInfo(props: PoolInfoProps) {
-  const { name, description, distributionTokenInfo, gdaPool } = props;
+  const {
+    name,
+    description,
+    distributionTokenInfo,
+    gdaPool,
+    showGranteeApplication,
+  } = props;
 
   const [showFullInfo, setShowFullInfo] = useState(false);
 
   const { council } = useCouncil();
   const { isMobile } = useMediaQuery();
+  const { address } = useAccount();
 
   const distributionMonthly =
     BigInt(gdaPool?.flowRate ?? 0) * BigInt(SECONDS_IN_MONTH);
@@ -34,6 +43,9 @@ export default function PoolInfo(props: PoolInfoProps) {
     BigInt(gdaPool?.totalAmountFlowedDistributedUntilUpdatedAt ?? 0),
     gdaPool?.updatedAtTimestamp ?? 0,
     BigInt(gdaPool?.flowRate ?? 0),
+  );
+  const isGrantee = !!council?.grantees.find(
+    (grantee) => grantee.account === address?.toLowerCase(),
   );
 
   useLayoutEffect(() => {
@@ -111,12 +123,13 @@ export default function PoolInfo(props: PoolInfoProps) {
               direction={isMobile ? "vertical" : "horizontal"}
               gap={4}
               className="justify-content-end w-100 mt-3"
+              onClick={showGranteeApplication}
             >
               <Button
                 className="p-2 text-light fs-5"
                 style={{ width: isMobile ? "100%" : 180 }}
               >
-                Become a Builder
+                {isGrantee ? "Edit Builder Profile" : "Become a Builder"}
               </Button>
             </Stack>
           </>

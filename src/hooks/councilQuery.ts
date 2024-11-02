@@ -6,6 +6,7 @@ const COUNCIL_QUERY = gql`
   query CouncilNameAndGrantees($council: String) {
     council(id: $council) {
       councilName
+      councilSymbol
       pool
       councilMembers {
         account

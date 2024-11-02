@@ -34,9 +34,9 @@ export default function Ballot({
     )?.votingPower ?? 0;
   const totalVotes =
     newAllocation?.allocation
-      .map((a) => a.amount)
+      ?.map((a) => a.amount)
       ?.reduce((a, b) => a + b, 0) ?? 0;
-  const newAllocationsCount = newAllocation?.allocation.length ?? 0;
+  const newAllocationsCount = newAllocation?.allocation?.length ?? 0;
 
   const handleAmountStepping = (args: {
     increment: boolean;
@@ -108,8 +108,8 @@ export default function Ballot({
           <p
             className={`w-50 mb-3 fs-4 ${newAllocationsCount > MAX_ALLOCATIONS_PER_MEMBER ? "text-danger" : "text-info"}`}
           >
-            ({newAllocation?.allocation.length}/{MAX_ALLOCATIONS_PER_MEMBER}{" "}
-            Projects)
+            ({newAllocation?.allocation?.length ?? 0}/
+            {MAX_ALLOCATIONS_PER_MEMBER} Projects)
           </p>
           <p
             className={`w-50 mb-3 text-end fs-4 ${totalVotes > votingPower ? "text-danger" : ""}`}
@@ -117,7 +117,7 @@ export default function Ballot({
             ({totalVotes}/{votingPower} Votes)
           </p>
         </Stack>
-        {newAllocation?.allocation.map((allocation, i) => {
+        {newAllocation?.allocation?.map((allocation, i) => {
           const councilGrantee = council?.grantees.find(
             (grantee) => grantee.account === allocation.grantee,
           );
@@ -209,7 +209,7 @@ export default function Ballot({
             {isVoting ? <Spinner size="sm" /> : "Vote"}
           </Button>
           {transactionError && (
-            <Alert variant="danger" className="mt-3">
+            <Alert variant="danger" className="mt-3 p-2">
               {transactionError}
             </Alert>
           )}

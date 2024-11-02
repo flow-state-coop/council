@@ -12,6 +12,7 @@ import { DEFAULT_CHAIN_ID } from "@/lib/constants";
 
 type Council = {
   councilName: string;
+  councilSymbol: string;
   councilMembers: {
     account: `0x${string}`;
     votingPower: number;

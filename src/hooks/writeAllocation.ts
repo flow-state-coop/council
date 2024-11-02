@@ -10,8 +10,8 @@ export default function useWriteAllocation(council: `0x${string}`) {
   const { data: walletClient } = useWalletClient();
 
   const vote = async (accounts: `0x${string}`[], amounts: bigint[]) => {
-    if (!council || !walletClient || !publicClient) {
-      throw new Error("Council or client is not set");
+    if (!walletClient || !publicClient) {
+      throw new Error("Public client was not found");
     }
 
     setIsVoting(true);
@@ -39,7 +39,7 @@ export default function useWriteAllocation(council: `0x${string}`) {
       });
 
       if (receipt.status !== "success") {
-        setTransactionError(receipt.status);
+        throw Error(`Transaction status: ${receipt.status}`);
       }
 
       setIsVoting(false);

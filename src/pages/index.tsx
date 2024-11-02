@@ -6,6 +6,7 @@ import Stack from "react-bootstrap/Stack";
 import Spinner from "react-bootstrap/Spinner";
 import Dropdown from "react-bootstrap/Dropdown";
 import GranteeCard from "@/components/GranteeCard";
+import RoundBanner from "@/components/RoundBanner";
 import Ballot from "@/components/Ballot";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import { ProjectMetadata } from "@/types/projectMetadata";
@@ -183,6 +184,12 @@ export default function Index() {
                   : 1600,
         }}
       >
+        <RoundBanner
+          name={council?.councilName ?? ""}
+          description="Flow Council"
+          distributionTokenInfo={network.tokens[0]}
+          gdaPool={gdaPool}
+        />
         <Stack
           direction="horizontal"
           gap={4}

@@ -93,7 +93,8 @@ function newAllocationReducer(
       }
 
       const nextAllocation =
-        action.currentAllocation && newAllocation.allocation.length === 0
+        action.currentAllocation?.allocation &&
+        newAllocation.allocation.length === 0
           ? [...action.currentAllocation.allocation, action.allocation]
           : newAllocation
             ? [...newAllocation.allocation, action.allocation]
@@ -128,7 +129,7 @@ function newAllocationReducer(
       return { ...newAllocation, showBallot: false };
     }
     default: {
-      throw Error("Unknown action: " + action.type);
+      throw Error(`Unknown action: ${action.type}`);
     }
   }
 }

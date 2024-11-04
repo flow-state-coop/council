@@ -200,6 +200,8 @@ export default function Ballot({
             disabled={
               totalVotes > votingPower ||
               newAllocationsCount > MAX_ALLOCATIONS_PER_MEMBER ||
+              !newAllocation?.allocation ||
+              newAllocation.allocation.length === 0 ||
               JSON.stringify(currentAllocation?.allocation) ===
                 JSON.stringify(newAllocation?.allocation)
             }

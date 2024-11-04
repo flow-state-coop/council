@@ -9,6 +9,7 @@ import GranteeCard from "@/components/GranteeCard";
 import RoundBanner from "@/components/RoundBanner";
 import Ballot from "@/components/Ballot";
 import GranteeApplication from "@/components/GranteeApplication";
+import DistributionPoolFunding from "@/components/DistributionPoolFunding";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import { ProjectMetadata } from "@/types/projectMetadata";
 import { Grantee, SortingMethod } from "@/types/grantee";
@@ -23,6 +24,8 @@ export default function Index() {
   const [grantees, setGrantees] = useState<Grantee[]>([]);
   const [sortingMethod, setSortingMethod] = useState(SortingMethod.RANDOM);
   const [showGranteeApplication, setShowGranteeApplication] = useState(false);
+  const [showDistributionPoolFunding, setShowDistributionPoolFunding] =
+    useState(false);
 
   const skipGrantees = useRef(0);
   const granteesBatch = useRef(1);
@@ -192,6 +195,9 @@ export default function Index() {
           distributionTokenInfo={network.tokens[0]}
           gdaPool={gdaPool}
           showGranteeApplication={() => setShowGranteeApplication(true)}
+          showDistributionPoolFunding={() =>
+            setShowDistributionPoolFunding(true)
+          }
         />
         <Stack
           direction="horizontal"
@@ -271,7 +277,12 @@ export default function Index() {
           )}
         </Stack>
       </Container>
-      {showGranteeApplication ? (
+      {showDistributionPoolFunding ? (
+        <DistributionPoolFunding
+          network={network}
+          hide={() => setShowDistributionPoolFunding(false)}
+        />
+      ) : showGranteeApplication ? (
         <GranteeApplication
           network={network}
           hide={() => setShowGranteeApplication(false)}

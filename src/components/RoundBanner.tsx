@@ -20,6 +20,7 @@ type PoolInfoProps = {
   distributionTokenInfo: Token;
   gdaPool?: GDAPool;
   showGranteeApplication: () => void;
+  showDistributionPoolFunding: () => void;
 };
 
 export default function PoolInfo(props: PoolInfoProps) {
@@ -29,6 +30,7 @@ export default function PoolInfo(props: PoolInfoProps) {
     distributionTokenInfo,
     gdaPool,
     showGranteeApplication,
+    showDistributionPoolFunding,
   } = props;
 
   const [showFullInfo, setShowFullInfo] = useState(false);
@@ -123,11 +125,19 @@ export default function PoolInfo(props: PoolInfoProps) {
               direction={isMobile ? "vertical" : "horizontal"}
               gap={4}
               className="justify-content-end w-100 mt-3"
-              onClick={showGranteeApplication}
             >
+              <Button
+                variant="secondary"
+                className="p-2 text-light fs-5"
+                style={{ width: isMobile ? "100%" : 180 }}
+                onClick={showDistributionPoolFunding}
+              >
+                Grow the Pie
+              </Button>
               <Button
                 className="p-2 text-light fs-5"
                 style={{ width: isMobile ? "100%" : 180 }}
+                onClick={showGranteeApplication}
               >
                 {isGrantee ? "Edit Builder Profile" : "Become a Builder"}
               </Button>

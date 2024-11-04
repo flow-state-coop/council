@@ -95,9 +95,9 @@ function newAllocationReducer(
 
       const nextAllocation =
         action.currentAllocation?.allocation &&
-        newAllocation.allocation.length === 0
+        (!newAllocation?.allocation || newAllocation.allocation.length === 0)
           ? [...action.currentAllocation.allocation, action.allocation]
-          : newAllocation
+          : newAllocation?.allocation
             ? [...newAllocation.allocation, action.allocation]
             : [action.allocation];
 

@@ -1,5 +1,19 @@
 import { formatEther } from "viem";
 
+export enum TimeInterval {
+  DAY = "/day",
+  WEEK = "/week",
+  MONTH = "/month",
+  YEAR = "/year",
+}
+
+export const unitOfTime = {
+  [TimeInterval.DAY]: "days",
+  [TimeInterval.WEEK]: "weeks",
+  [TimeInterval.MONTH]: "months",
+  [TimeInterval.YEAR]: "years",
+};
+
 export function isNumber(value: string) {
   return !isNaN(Number(value)) && !isNaN(parseFloat(value));
 }
@@ -85,6 +99,18 @@ export function fromTimeUnitsToSeconds(units: number, type: string) {
   }
 
   return result;
+}
+
+export function convertStreamValueToInterval(
+  amount: bigint,
+  from: TimeInterval,
+  to: TimeInterval,
+) {
+  return roundWeiAmount(
+    (amount / BigInt(fromTimeUnitsToSeconds(1, unitOfTime[from]))) *
+      BigInt(fromTimeUnitsToSeconds(1, unitOfTime[to])),
+    4,
+  );
 }
 
 export function truncateStr(str: string, strLen: number) {

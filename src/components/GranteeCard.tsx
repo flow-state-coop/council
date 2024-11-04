@@ -6,9 +6,11 @@ import Stack from "react-bootstrap/Stack";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
+import Toast from "react-bootstrap/Toast";
 import { CouncilMember } from "@/types/councilMember";
 import { Network } from "@/types/network";
 import useCouncil from "@/hooks/council";
+import { useMediaQuery } from "@/hooks/mediaQuery";
 import { roundWeiAmount } from "@/lib/utils";
 import { IPFS_GATEWAYS, SECONDS_IN_MONTH } from "@/lib/constants";
 
@@ -45,8 +47,10 @@ export default function Grantee(props: GranteeProps) {
 
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   const { address } = useAccount();
+  const { isMobile } = useMediaQuery();
   const { newAllocation, council, currentAllocation, dispatchNewAllocation } =
     useCouncil();
   const [descriptionRef, { noClamp, clampedText }] = useClampText({
@@ -103,96 +107,115 @@ export default function Grantee(props: GranteeProps) {
   }, [logoCid, bannerCid]);
 
   return (
-    <Card
-      className="rounded-4 overflow-hidden"
-      style={{
-        height: 400,
-        border: isSelected ? "1px solid #247789" : "1px solid #212529",
-        boxShadow: isSelected ? "0px 0px 0px 2px #247789" : "",
-      }}
-    >
-      <Card.Img
-        variant="top"
-        src={bannerUrl === "" ? placeholderBanner : bannerUrl}
-        height={102}
-        className="bg-light"
-      />
-      <Image
-        src={logoUrl === "" ? placeholderLogo : logoUrl}
-        alt=""
-        width={52}
-        height={52}
-        className="rounded-3 position-absolute border border-2 border-light bg-white"
-        style={{ bottom: 270, left: 16 }}
-      />
-      <Card.Body className="mt-3 pb-0">
-        <Card.Text
-          className="d-inline-block m-0 fs-5 word-wrap text-truncate"
-          style={{ maxWidth: 256 }}
-        >
-          {name}
-        </Card.Text>
-        <Card.Text
-          ref={descriptionRef as React.RefObject<HTMLParagraphElement>}
-          className="m-0 mb-3"
-          style={{ fontSize: "0.9rem", minHeight: noClamp ? "4lh" : "auto" }}
-        >
-          {clampedText}
-        </Card.Text>
-        <Stack direction="horizontal" className="me-2">
-          <Stack direction="vertical" className="align-items-center w-33">
-            <Card.Text as="small" className="m-0 fw-bold">
-              Total Votes
-            </Card.Text>
-            <Card.Text as="small" className="m-0">
-              {units}
-            </Card.Text>
-          </Stack>
-          <Stack direction="vertical" className="align-items-center w-33">
-            <Card.Text as="small" className="m-0 fw-bold">
-              Current Stream
-            </Card.Text>
-            <Card.Text as="small" className="m-0">
-              {monthlyFlow} {network.tokens[0].name} /mo
-            </Card.Text>
-          </Stack>
-        </Stack>
-      </Card.Body>
-      <Card.Footer
-        className="d-flex justify-content-between bg-light border-0 py-3"
-        style={{ fontSize: "15px" }}
+    <>
+      <Card
+        className="rounded-4 overflow-hidden"
+        style={{
+          height: 400,
+          border: isSelected ? "1px solid #247789" : "1px solid #212529",
+          boxShadow: isSelected ? "0px 0px 0px 2px #247789" : "",
+        }}
       >
-        <Stack
-          direction="horizontal"
-          gap={2}
-          className="justify-content-end w-100 me-4"
-        >
-          <Button
-            variant="link"
-            href={`https://flowstate.network/projects/${id}/?chainId=${network.id}`}
-            target="_blank"
-            className="d-flex justify-content-center bg-secondary w-33 px-5 text-light"
+        <Card.Img
+          variant="top"
+          src={bannerUrl === "" ? placeholderBanner : bannerUrl}
+          height={102}
+          className="bg-light"
+        />
+        <Image
+          src={logoUrl === "" ? placeholderLogo : logoUrl}
+          alt=""
+          width={52}
+          height={52}
+          className="rounded-3 position-absolute border border-2 border-light bg-white"
+          style={{ bottom: 270, left: 16 }}
+        />
+        <Card.Body className="mt-3 pb-0">
+          <Card.Text
+            className="d-inline-block m-0 fs-5 word-wrap text-truncate"
+            style={{ maxWidth: 256 }}
           >
-            <Image src="/open-new.svg" alt="Profile" width={22} height={22} />
-          </Button>
-          {isCouncilMember && (
+            {name}
+          </Card.Text>
+          <Card.Text
+            ref={descriptionRef as React.RefObject<HTMLParagraphElement>}
+            className="m-0 mb-3"
+            style={{ fontSize: "0.9rem", minHeight: noClamp ? "4lh" : "auto" }}
+          >
+            {clampedText}
+          </Card.Text>
+          <Stack direction="horizontal" className="me-2">
+            <Stack direction="vertical" className="align-items-center w-33">
+              <Card.Text as="small" className="m-0 fw-bold">
+                Total Votes
+              </Card.Text>
+              <Card.Text as="small" className="m-0">
+                {units}
+              </Card.Text>
+            </Stack>
+            <Stack direction="vertical" className="align-items-center w-33">
+              <Card.Text as="small" className="m-0 fw-bold">
+                Current Stream
+              </Card.Text>
+              <Card.Text as="small" className="m-0">
+                {monthlyFlow} {network.tokens[0].name} /mo
+              </Card.Text>
+            </Stack>
+          </Stack>
+        </Card.Body>
+        <Card.Footer
+          className="d-flex justify-content-between bg-light border-0 py-3"
+          style={{ fontSize: "15px" }}
+        >
+          <Stack
+            direction="horizontal"
+            gap={2}
+            className="justify-content-end w-100 me-4"
+          >
             <Button
-              disabled={hasAllocated}
-              onClick={() =>
-                dispatchNewAllocation({
-                  type: "add",
-                  allocation: { grantee: granteeAddress, amount: 0 },
-                  currentAllocation,
-                })
-              }
-              className="d-flex justify-content-center align-items-center gap-1 w-33 px-5"
+              variant="link"
+              href={`https://flowstate.network/projects/${id}/?chainId=${network.id}`}
+              target="_blank"
+              className="d-flex justify-content-center bg-secondary w-33 px-5 text-light"
             >
-              <Image src="/add.svg" alt="Add" width={16} height={16} />
-              <Image src="/cart.svg" alt="Cart" width={22} height={22} />
+              <Image src="/open-new.svg" alt="Profile" width={22} height={22} />
             </Button>
-          )}
-        </Stack>
-      </Card.Footer>
-    </Card>
+            {isCouncilMember && (
+              <Button
+                disabled={hasAllocated}
+                onClick={() => {
+                  dispatchNewAllocation({
+                    type: "add",
+                    allocation: { grantee: granteeAddress, amount: 0 },
+                    currentAllocation,
+                  });
+                  setShowToast(true);
+                }}
+                className="d-flex justify-content-center align-items-center gap-1 w-33 px-5"
+              >
+                <Image src="/add.svg" alt="Add" width={16} height={16} />
+                <Image src="/cart.svg" alt="Cart" width={22} height={22} />
+              </Button>
+            )}
+          </Stack>
+        </Card.Footer>
+      </Card>
+      <Toast
+        show={showToast}
+        delay={3000}
+        autohide
+        style={{
+          position: "fixed",
+          top: 20,
+          right: isMobile ? "" : 20,
+          background: "rgb(219, 252.2, 221)",
+          color: "rgb(30, 96.4, 34)",
+          zIndex: 2,
+        }}
+        onClose={() => setShowToast(false)}
+      >
+        <Toast.Body>Added to ballot!</Toast.Body>
+      </Toast>
+    </>
   );
 }

@@ -80,7 +80,7 @@ export default function GranteeApplication(props: GranteeApplication) {
     <Offcanvas show onHide={hide} placement="end">
       <Offcanvas.Header closeButton className="pb-0">
         <Offcanvas.Title className="fs-3">
-          Welcome {council?.councilSymbol ?? ""} Builder
+          Welcome {council?.councilName ?? ""} Builder
         </Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>

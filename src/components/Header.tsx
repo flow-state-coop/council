@@ -24,7 +24,10 @@ export default function Header() {
   );
 
   return (
-    <Nav className="w-100 shadow">
+    <Nav
+      className="position-sticky top-0 bg-light w-100 shadow"
+      style={{ zIndex: 1 }}
+    >
       <Stack
         direction="horizontal"
         className="justify-content-between mx-auto px-4"

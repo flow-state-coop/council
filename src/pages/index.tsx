@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { Address } from "viem";
 import { useRouter } from "next/router";
 import { useInView } from "react-intersection-observer";
 import Container from "react-bootstrap/Container";
@@ -302,6 +303,7 @@ export default function Index() {
       ) : showGranteeApplication ? (
         <GranteeApplication
           network={network}
+          gdaPoolAddress={council?.pool as Address}
           hide={() => setShowGranteeApplication(false)}
         />
       ) : newAllocation?.showBallot ? (

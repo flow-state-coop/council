@@ -12,12 +12,14 @@ import { Network } from "@/types/network";
 import { ProjectMetadata } from "@/types/projectMetadata";
 import useCouncil from "@/hooks/council";
 import useGuildCheck from "@/hooks/guildCheck";
+import useGdaPoolConnection from "@/hooks/gdaPoolConnection";
 import useFlowStateProjectsQuery from "@/hooks/flowStateProjectsQuery";
 
 type Project = { id: string; metadata: ProjectMetadata };
 
 type GranteeApplication = {
   network: Network;
+  gdaPoolAddress: Address;
   hide: () => void;
 };
 
@@ -26,17 +28,24 @@ enum ApplicationError {
 }
 
 export default function GranteeApplication(props: GranteeApplication) {
-  const { network, hide } = props;
+  const { network, gdaPoolAddress, hide } = props;
 
   const [selectedProject, setSelectedProject] = useState<Project>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const { council } = useCouncil();
   const { address } = useAccount();
   const { hasGuildRole, isCheckingGuild, checkGuildMembership } = useGuildCheck(
     address as Address,
   );
+  const { isConnectedToPool, isConnectingToPool, connectToPool } =
+    useGdaPoolConnection({
+      address: address as Address,
+      gdaPoolAddress,
+      gdaForwarderAddress: network.gdaForwarder,
+    });
   const projects = useFlowStateProjectsQuery(network, address ?? "");
   const grantee = council?.grantees.find(
     (grantee) => grantee.account === address?.toLowerCase(),
@@ -65,6 +74,10 @@ export default function GranteeApplication(props: GranteeApplication) {
         setError(ApplicationError.FAIL);
       }
 
+      if (data.success) {
+        setSuccess("Success! You're in.");
+      }
+
       setIsLoading(false);
 
       console.info(data);
@@ -78,19 +91,19 @@ export default function GranteeApplication(props: GranteeApplication) {
 
   return (
     <Offcanvas show onHide={hide} placement="end">
-      <Offcanvas.Header closeButton className="pb-0">
-        <Offcanvas.Title className="fs-3">
-          Welcome {council?.councilName ?? ""} Builder
-        </Offcanvas.Title>
+      <Offcanvas.Header closeButton className="pb-0 align-items-start">
+        <Stack direction="vertical">
+          <Offcanvas.Title className="fs-4">
+            Welcome {council?.councilName ?? ""} Builder
+          </Offcanvas.Title>
+          <p className="text-info fs-6">
+            Text explaining the eligibility criteria and the general setup for
+            the Guildathon.
+          </p>
+        </Stack>
       </Offcanvas.Header>
-      <Offcanvas.Body>
-        <p className="text-info fs-4">
-          Text explaining the eligibility criteria and the general setup for the
-          Guildathon.
-        </p>
-        <p className="mt-4">
-          1. Earn the Builder role in the {council?.councilSymbol ?? ""} Guild
-        </p>
+      <Offcanvas.Body className="flex-grow-0 bg-light rounded-4 mx-3 mt-2 py-4">
+        <p>1. Earn the Builder role in the /onchain Guild</p>
         <Stack direction="horizontal" gap={3}>
           <Button
             variant="link"
@@ -108,7 +121,9 @@ export default function GranteeApplication(props: GranteeApplication) {
               pointerEvents: hasGuildRole || isCheckingGuild ? "none" : "auto",
             }}
           >
-            {hasGuildRole ? (
+            {isCheckingGuild ? (
+              <Spinner size="sm" />
+            ) : hasGuildRole ? (
               <Image
                 src="success.svg"
                 alt="Success"
@@ -116,24 +131,36 @@ export default function GranteeApplication(props: GranteeApplication) {
                 height={28}
                 style={{
                   filter:
-                    "invert(35%) sepia(96%) saturate(1004%) hue-rotate(132deg) brightness(96%) contrast(88%)",
+                    "brightness(0) saturate(100%) invert(85%) sepia(8%) saturate(138%) hue-rotate(138deg) brightness(93%) contrast(106%)",
                 }}
               />
-            ) : isCheckingGuild ? (
-              <Spinner size="sm" />
             ) : (
-              "Check Role"
+              <Stack direction="horizontal" gap={1} className="small">
+                <Image src="reload.svg" alt="refresh" width={28} height={28} />
+                Role not found
+              </Stack>
             )}
           </Button>
         </Stack>
-        <p className="mt-5">2. Submit your builder information</p>
+        {!hasGuildRole && !isCheckingGuild && (
+          <p className="m-0 mt-1 me-1 float-end small">
+            Visit guild and try again
+          </p>
+        )}
+        <p className="mt-5">
+          2. Submit your builder profile info to join the round
+        </p>
         <Dropdown>
           <Dropdown.Toggle
             variant="transparent"
             disabled={isGrantee || !projects || projects.length === 0}
             className={`d-flex justify-content-between align-items-center w-100 border border-2 ${selectedProject ? "" : "text-info"}`}
           >
-            {selectedProject?.metadata?.title ?? "Select your project"}
+            {selectedProject?.metadata?.title ??
+              projects?.find(
+                (project: { id: string }) => project.id === grantee?.name,
+              )?.metadata.title ??
+              "Select your project"}
           </Dropdown.Toggle>
           <Dropdown.Menu>
             {projects &&
@@ -179,7 +206,7 @@ export default function GranteeApplication(props: GranteeApplication) {
                 height={28}
                 style={{
                   filter:
-                    "invert(35%) sepia(96%) saturate(1004%) hue-rotate(132deg) brightness(96%) contrast(88%)",
+                    "brightness(0) saturate(100%) invert(85%) sepia(8%) saturate(138%) hue-rotate(138deg) brightness(93%) contrast(106%)",
                 }}
               />
             </Button>
@@ -198,9 +225,26 @@ export default function GranteeApplication(props: GranteeApplication) {
             {error}
           </Alert>
         )}
+        {success && <p className="m-0 mt-1 me-1 small float-end">{success}</p>}
         <p className="mt-5">
-          3. Post project updates in {council?.councilSymbol ?? ""} & join the
-          next demo day.
+          3. Complete a one-time transaction to see ONCHAINx flow to your wallet
+          in real-time
+        </p>
+        <Button
+          disabled={isConnectedToPool}
+          className="w-100 bg-secondary text-light"
+          onClick={connectToPool}
+        >
+          {isConnectingToPool ? (
+            <Spinner size="sm" />
+          ) : isConnectedToPool ? (
+            "Connected"
+          ) : (
+            "Connect"
+          )}
+        </Button>
+        <p className="mt-5">
+          4. Post project updates in /onchain & join the next demo day
         </p>
         <Stack direction="horizontal" gap={3}>
           <Button
@@ -213,11 +257,11 @@ export default function GranteeApplication(props: GranteeApplication) {
           </Button>
           <Button
             variant="link"
-            href="https://guild.xyz/test-3533c0"
+            href="https://warpcast.com/~/channel/onchain"
             target="_blank"
             className="w-50 bg-primary text-light"
           >
-            {council?.councilSymbol ?? "N/A"}
+            /onchain
           </Button>
         </Stack>
       </Offcanvas.Body>

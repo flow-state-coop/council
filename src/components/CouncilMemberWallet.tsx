@@ -3,7 +3,6 @@ import { useAccount } from "wagmi";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Stack from "react-bootstrap/Stack";
-import Badge from "react-bootstrap/Badge";
 import Image from "next/image";
 import useCouncil from "@/hooks/council";
 import { useMediaQuery } from "@/hooks/mediaQuery";

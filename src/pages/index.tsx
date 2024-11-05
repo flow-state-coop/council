@@ -108,6 +108,16 @@ export default function Index() {
       return;
     }
 
+    const hasNewGranteeBeenAdded =
+      !hasNextGrantee.current &&
+      skipGrantees.current === council.grantees.length;
+
+    if (hasNewGranteeBeenAdded) {
+      hasNextGrantee.current = true;
+      skipGrantees.current = 0;
+      granteesBatch.current = 1;
+    }
+
     if (inView && hasNextGrantee.current) {
       const grantees: Grantee[] = [];
 
@@ -118,7 +128,7 @@ export default function Index() {
       ) {
         skipGrantees.current = i + 1;
 
-        if (skipGrantees.current == council.grantees.length) {
+        if (skipGrantees.current === council.grantees.length) {
           hasNextGrantee.current = false;
         }
 
@@ -140,14 +150,17 @@ export default function Index() {
         }
       }
 
-      if (grantees.length >= GRANTEES_BATCH_SIZE * granteesBatch.current) {
+      if (grantees.length >= GRANTEES_BATCH_SIZE) {
         granteesBatch.current++;
       }
 
       setGrantees((prev) =>
-        sortingMethod !== SortingMethod.RANDOM || granteesBatch.current <= 1
-          ? sortGrantees(prev.concat(grantees))
-          : prev.concat(grantees),
+        hasNewGranteeBeenAdded
+          ? sortGrantees(grantees)
+          : sortingMethod !== SortingMethod.RANDOM ||
+              granteesBatch.current === 1
+            ? sortGrantees(prev.concat(grantees))
+            : prev.concat(grantees),
       );
     } else {
       setGrantees((prev) => {
@@ -173,6 +186,10 @@ export default function Index() {
     sortingMethod,
     sortGrantees,
   ]);
+
+  useEffect(() => {
+    setGrantees((prev) => sortGrantees(prev));
+  }, [sortingMethod, sortGrantees]);
 
   return (
     <>
@@ -251,7 +268,7 @@ export default function Index() {
           >
             {grantees.map((grantee: Grantee) => (
               <GranteeCard
-                key={grantee.id}
+                key={`${grantee.address}-${grantee.id}`}
                 id={grantee.id}
                 granteeAddress={grantee.address}
                 name={grantee.metadata.title}

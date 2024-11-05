@@ -13,7 +13,7 @@ const COUNCIL_QUERY = gql`
         votingPower
         enabled
       }
-      grantees {
+      grantees(where: { enabled: true }) {
         name
         account
         enabled

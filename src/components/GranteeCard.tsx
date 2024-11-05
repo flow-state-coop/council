@@ -177,7 +177,17 @@ export default function Grantee(props: GranteeProps) {
                 variant={hasAllocated ? "secondary" : "primary"}
                 onClick={() => {
                   if (hasAllocated) {
-                    dispatchNewAllocation({ type: "show-ballot" });
+                    if (
+                      newAllocation?.allocation &&
+                      newAllocation.allocation.length > 0
+                    ) {
+                      dispatchNewAllocation({ type: "show-ballot" });
+                    } else {
+                      dispatchNewAllocation({
+                        type: "add",
+                        currentAllocation,
+                      });
+                    }
                   } else {
                     dispatchNewAllocation({
                       type: "add",
@@ -219,7 +229,7 @@ export default function Grantee(props: GranteeProps) {
               variant="link"
               href={`https://flowstate.network/projects/${id}/?chainId=${network.id}`}
               target="_blank"
-              className="d-flex justify-content-center p-0"
+              className="d-flex justify-content-center ms-auto p-0"
             >
               <Image src="/open-new.svg" alt="Profile" width={28} height={28} />
             </Button>
@@ -243,7 +253,7 @@ export default function Grantee(props: GranteeProps) {
         <Toast.Body>
           <b>Added to ballot!</b>
           <br />
-          Don't forget to submit your transaction.
+          Don't forget to submit it with a transaction.
         </Toast.Body>
       </Toast>
     </>

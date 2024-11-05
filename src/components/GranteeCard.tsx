@@ -164,39 +164,65 @@ export default function Grantee(props: GranteeProps) {
           </Stack>
         </Card.Body>
         <Card.Footer
-          className="d-flex justify-content-between bg-light border-0 py-3"
-          style={{ fontSize: "15px" }}
+          className="d-flex justify-content-between border-0 py-3"
+          style={{ fontSize: "15px", background: "#e0e4ec" }}
         >
           <Stack
             direction="horizontal"
             gap={2}
-            className="justify-content-end w-100 me-4"
+            className="justify-content-between w-100"
           >
+            {isCouncilMember && (
+              <Button
+                variant={hasAllocated ? "secondary" : "primary"}
+                onClick={() => {
+                  if (hasAllocated) {
+                    dispatchNewAllocation({ type: "show-ballot" });
+                  } else {
+                    dispatchNewAllocation({
+                      type: "add",
+                      allocation: { grantee: granteeAddress, amount: 0 },
+                      currentAllocation,
+                    });
+                    setShowToast(true);
+                  }
+                }}
+                className="d-flex justify-content-center align-items-center gap-1 w-33 px-5"
+              >
+                {hasAllocated ? (
+                  <Image
+                    src="/success.svg"
+                    alt="Done"
+                    width={20}
+                    height={20}
+                    style={{
+                      filter:
+                        "invert(100%) sepia(100%) saturate(0%) hue-rotate(160deg) brightness(103%) contrast(103%)",
+                    }}
+                  />
+                ) : (
+                  <Image src="/add.svg" alt="Add" width={16} height={16} />
+                )}
+                <Image
+                  src="/ballot.svg"
+                  alt="Cart"
+                  width={22}
+                  height={22}
+                  style={{
+                    filter:
+                      "invert(100%) sepia(100%) saturate(0%) hue-rotate(160deg) brightness(103%) contrast(103%)",
+                  }}
+                />
+              </Button>
+            )}
             <Button
               variant="link"
               href={`https://flowstate.network/projects/${id}/?chainId=${network.id}`}
               target="_blank"
-              className="d-flex justify-content-center bg-secondary w-33 px-5 text-light"
+              className="d-flex justify-content-center p-0"
             >
-              <Image src="/open-new.svg" alt="Profile" width={22} height={22} />
+              <Image src="/open-new.svg" alt="Profile" width={28} height={28} />
             </Button>
-            {isCouncilMember && (
-              <Button
-                disabled={hasAllocated}
-                onClick={() => {
-                  dispatchNewAllocation({
-                    type: "add",
-                    allocation: { grantee: granteeAddress, amount: 0 },
-                    currentAllocation,
-                  });
-                  setShowToast(true);
-                }}
-                className="d-flex justify-content-center align-items-center gap-1 w-33 px-5"
-              >
-                <Image src="/add.svg" alt="Add" width={16} height={16} />
-                <Image src="/cart.svg" alt="Cart" width={22} height={22} />
-              </Button>
-            )}
           </Stack>
         </Card.Footer>
       </Card>
@@ -214,7 +240,11 @@ export default function Grantee(props: GranteeProps) {
         }}
         onClose={() => setShowToast(false)}
       >
-        <Toast.Body>Added to ballot!</Toast.Body>
+        <Toast.Body>
+          <b>Added to ballot!</b>
+          <br />
+          Don't forget to submit your transaction.
+        </Toast.Body>
       </Toast>
     </>
   );

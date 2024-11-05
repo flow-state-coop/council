@@ -103,14 +103,12 @@ export default function ConnectWallet() {
                     JSON.stringify(currentAllocation?.allocation) !==
                       JSON.stringify(newAllocation?.allocation) ? (
                       <Stack direction="horizontal" gap={2}>
-                        <Badge className="p-1 bg-danger rounded-circle">
-                          <Image
-                            src="/cart.svg"
-                            alt="wallet"
-                            width={16}
-                            height={16}
-                          />
-                        </Badge>
+                        <Image
+                          src="/ballot.svg"
+                          alt="wallet"
+                          width={18}
+                          height={18}
+                        />
                         {isMobile ? "" : "Vote"}
                       </Stack>
                     ) : (

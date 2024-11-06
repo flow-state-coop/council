@@ -165,7 +165,7 @@ export default function Grantee(props: GranteeProps) {
         </Card.Body>
         <Card.Footer
           className="d-flex justify-content-between border-0 py-3"
-          style={{ fontSize: "15px", background: "#e0e4ec" }}
+          style={{ fontSize: "15px", background: "rgb(215, 215, 220)" }}
         >
           <Stack
             direction="horizontal"

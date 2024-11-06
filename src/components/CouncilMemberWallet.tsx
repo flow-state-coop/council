@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Stack from "react-bootstrap/Stack";
+import Badge from "react-bootstrap/Badge";
 import Image from "next/image";
 import useCouncil from "@/hooks/council";
 import { useMediaQuery } from "@/hooks/mediaQuery";
@@ -102,12 +103,18 @@ export default function ConnectWallet() {
                     JSON.stringify(currentAllocation?.allocation) !==
                       JSON.stringify(newAllocation?.allocation) ? (
                       <Stack direction="horizontal" gap={2}>
-                        <Image
-                          src="/ballot.svg"
-                          alt="wallet"
-                          width={18}
-                          height={18}
-                        />
+                        <Badge className="p-1 bg-danger rounded-circle">
+                          <Image
+                            src="/ballot.svg"
+                            alt="wallet"
+                            width={16}
+                            height={16}
+                            style={{
+                              filter:
+                                "invert(99%) sepia(38%) saturate(0%) hue-rotate(79deg) brightness(110%) contrast(101%)",
+                            }}
+                          />
+                        </Badge>
                         {isMobile ? "" : "Vote"}
                       </Stack>
                     ) : (

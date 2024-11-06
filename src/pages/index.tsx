@@ -111,7 +111,7 @@ export default function Index() {
 
     const hasNewGranteeBeenAdded =
       !hasNextGrantee.current &&
-      skipGrantees.current === council.grantees.length;
+      skipGrantees.current - 1 !== council.grantees.length;
 
     if (hasNewGranteeBeenAdded) {
       hasNextGrantee.current = true;

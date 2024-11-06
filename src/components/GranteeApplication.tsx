@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 import Stack from "react-bootstrap/Stack";
@@ -34,6 +35,7 @@ export default function GranteeApplication(props: GranteeApplication) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const { openConnectModal } = useConnectModal();
   const { council } = useCouncil();
   const { address } = useAccount();
   const { hasGuildRole, isCheckingGuild, checkGuildMembership } = useGuildCheck(
@@ -118,7 +120,7 @@ export default function GranteeApplication(props: GranteeApplication) {
                 <Button
                   variant={hasGuildRole ? "success" : "primary"}
                   className={`w-100 ${hasGuildRole ? "py-1" : ""}`}
-                  onClick={checkGuildMembership}
+                  onClick={address ? checkGuildMembership : openConnectModal}
                   style={{
                     pointerEvents:
                       hasGuildRole || isCheckingGuild ? "none" : "auto",
@@ -191,6 +193,12 @@ export default function GranteeApplication(props: GranteeApplication) {
               className="align-items-start mt-3"
             >
               <Button
+                onClick={(e) => {
+                  if (!address && openConnectModal) {
+                    e.preventDefault();
+                    openConnectModal();
+                  }
+                }}
                 variant="link"
                 href={
                   isGrantee || selectedProject

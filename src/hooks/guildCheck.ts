@@ -12,6 +12,8 @@ export default function useGuildCheck(address: Address) {
 
   const checkGuildMembership = useCallback(async () => {
     if (!address) {
+      setIsCheckingGuild(false);
+
       return;
     }
 

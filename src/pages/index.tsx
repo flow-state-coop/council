@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Address } from "viem";
 import { useRouter } from "next/router";
-import { useInView } from "react-intersection-observer";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Spinner from "react-bootstrap/Spinner";
@@ -19,8 +18,6 @@ import { networks } from "@/lib/networks";
 import { shuffle, getPlaceholderImageSrc } from "@/lib/utils";
 import { DEFAULT_CHAIN_ID } from "@/lib/constants";
 
-const GRANTEES_BATCH_SIZE = 20;
-
 export default function Index() {
   const [grantees, setGrantees] = useState<Grantee[]>([]);
   const [sortingMethod, setSortingMethod] = useState(SortingMethod.RANDOM);
@@ -29,7 +26,6 @@ export default function Index() {
     useState(false);
 
   const skipGrantees = useRef(0);
-  const granteesBatch = useRef(1);
   const hasNextGrantee = useRef(true);
 
   const router = useRouter();
@@ -41,7 +37,6 @@ export default function Index() {
   useMediaQuery();
   const { isMobile, isTablet, isSmallScreen, isMediumScreen, isBigScreen } =
     useMediaQuery();
-  const [sentryRef, inView] = useInView();
   const { newAllocation, council, flowStateProfiles, gdaPool } = useCouncil();
 
   const getGrantee = useCallback(
@@ -109,24 +104,19 @@ export default function Index() {
       return;
     }
 
-    const hasNewGranteeBeenAdded =
+    const hasGranteeBeenAddedOrRemoved =
       !hasNextGrantee.current &&
-      skipGrantees.current - 1 !== council.grantees.length;
+      skipGrantees.current !== council.grantees.length;
 
-    if (hasNewGranteeBeenAdded) {
+    if (hasGranteeBeenAddedOrRemoved) {
       hasNextGrantee.current = true;
       skipGrantees.current = 0;
-      granteesBatch.current = 1;
     }
 
-    if (inView && hasNextGrantee.current) {
+    if (hasNextGrantee.current) {
       const grantees: Grantee[] = [];
 
-      for (
-        let i = skipGrantees.current;
-        i < GRANTEES_BATCH_SIZE * granteesBatch.current;
-        i++
-      ) {
+      for (let i = skipGrantees.current; i < council.grantees.length; i++) {
         skipGrantees.current = i + 1;
 
         if (skipGrantees.current === council.grantees.length) {
@@ -151,18 +141,7 @@ export default function Index() {
         }
       }
 
-      if (grantees.length >= GRANTEES_BATCH_SIZE) {
-        granteesBatch.current++;
-      }
-
-      setGrantees((prev) =>
-        hasNewGranteeBeenAdded
-          ? sortGrantees(grantees)
-          : sortingMethod !== SortingMethod.RANDOM ||
-              granteesBatch.current === 1
-            ? sortGrantees(prev.concat(grantees))
-            : prev.concat(grantees),
-      );
+      setGrantees(sortGrantees(grantees));
     } else {
       setGrantees((prev) => {
         const grantees: Grantee[] = [];
@@ -182,7 +161,6 @@ export default function Index() {
     council,
     flowStateProfiles,
     gdaPool,
-    inView,
     getGrantee,
     sortingMethod,
     sortGrantees,
@@ -290,7 +268,7 @@ export default function Index() {
               direction="horizontal"
               className="justify-content-center m-auto"
             >
-              <Spinner ref={sentryRef}></Spinner>
+              <Spinner />
             </Stack>
           )}
         </Stack>

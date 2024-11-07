@@ -12,7 +12,11 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { Step } from "@/types/distributionPoolFunding";
 import { Token } from "@/types/token";
-import { formatNumberWithCommas, isNumber } from "@/lib/utils";
+import {
+  formatNumberWithCharSuffix,
+  formatNumberWithCommas,
+  isNumber,
+} from "@/lib/utils";
 
 export type WrapProps = {
   step: Step;
@@ -151,7 +155,10 @@ export default function Wrap(props: WrapProps) {
             <Card.Text className="w-100 bg-white m-0 mb-2 px-2 pb-2 rounded-bottom-4 text-end fs-6">
               Balance:{" "}
               {underlyingTokenBalance
-                ? underlyingTokenBalance.formatted.slice(0, 8)
+                ? formatNumberWithCharSuffix(
+                    Number(underlyingTokenBalance.formatted),
+                    1,
+                  )
                 : ""}
             </Card.Text>
             <Badge
@@ -187,7 +194,11 @@ export default function Wrap(props: WrapProps) {
               </Badge>
             </Stack>
             <Card.Text className="w-100 bg-white m-0 px-2 pb-2 rounded-bottom-4 text-end fs-6">
-              Balance: {formatEther(superTokenBalance).slice(0, 8)}
+              Balance:{" "}
+              {formatNumberWithCharSuffix(
+                Number(formatEther(superTokenBalance)),
+                1,
+              )}
             </Card.Text>
           </Stack>
           {underlyingTokenBalance &&

@@ -17,7 +17,7 @@ import { Step } from "@/types/distributionPoolFunding";
 import { Token } from "@/types/token";
 import { Network } from "@/types/network";
 import {
-  formatNumberWithCommas,
+  formatNumberWithCharSuffix,
   TimeInterval,
   convertStreamValueToInterval,
   truncateStr,
@@ -334,8 +334,8 @@ export default function Review(props: ReviewProps) {
                   className="mx-1"
                 />
                 <Badge className="bg-info w-75 ps-2 pe-2 py-2 fs-6 text-start overflow-hidden text-truncate">
-                  {formatNumberWithCommas(
-                    parseFloat(
+                  {formatNumberWithCharSuffix(
+                    Number(
                       convertStreamValueToInterval(
                         parseEther(
                           areTransactionsLoading && transactionDetailsSnapshot
@@ -346,6 +346,7 @@ export default function Review(props: ReviewProps) {
                         TimeInterval.MONTH,
                       ),
                     ),
+                    1,
                   )}
                 </Badge>
               </Stack>
@@ -447,8 +448,8 @@ export default function Review(props: ReviewProps) {
                       className="mx-1"
                     />
                     <Badge className="bg-info w-75 ps-2 pe-2 py-2 fs-6 text-start overflow-hidden text-truncate">
-                      {formatNumberWithCommas(
-                        parseFloat(
+                      {formatNumberWithCharSuffix(
+                        Number(
                           convertStreamValueToInterval(
                             parseEther(
                               areTransactionsLoading &&
@@ -460,6 +461,7 @@ export default function Review(props: ReviewProps) {
                             TimeInterval.MONTH,
                           ),
                         ),
+                        1,
                       )}
                     </Badge>
                   </Stack>

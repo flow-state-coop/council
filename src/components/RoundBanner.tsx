@@ -12,6 +12,7 @@ import { Token } from "@/types/token";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import useCouncil from "@/hooks/council";
 import useFlowingAmount from "@/hooks/flowingAmount";
+import { formatNumberWithCharSuffix } from "@/lib/utils";
 import { SECONDS_IN_MONTH } from "@/lib/constants";
 
 type PoolInfoProps = {
@@ -108,11 +109,15 @@ export default function PoolInfo(props: PoolInfoProps) {
                     {distributionTokenInfo.name}
                   </td>
                   <td className="w-20 bg-transparent">
-                    {Number(formatEther(distributionMonthly)).toFixed(4)}
+                    {formatNumberWithCharSuffix(
+                      Number(formatEther(distributionMonthly)),
+                      0,
+                    )}
                   </td>
                   <td className="w-20 bg-transparent">
-                    {Number(formatEther(distributionTotal)).toFixed(
-                      isMobile ? 4 : 6,
+                    {formatNumberWithCharSuffix(
+                      Number(formatEther(distributionTotal)),
+                      4,
                     )}
                   </td>
                   <td className="w-20 bg-transparent">

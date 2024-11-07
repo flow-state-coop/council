@@ -9,7 +9,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { GDAPool } from "@/types/gdaPool";
 import { Token } from "@/types/token";
 import useFlowingAmount from "@/hooks/flowingAmount";
-import { roundWeiAmount, formatNumberWithCommas } from "@/lib/utils";
+import { roundWeiAmount, formatNumberWithCharSuffix } from "@/lib/utils";
 import { SECONDS_IN_MONTH } from "@/lib/constants";
 
 interface DistributionPoolDetailsProps {
@@ -98,13 +98,14 @@ export default function DistributionPoolDetails(
             ) : (
               <>
                 <Card.Text as="span" className="fs-1">
-                  {formatNumberWithCommas(
-                    parseFloat(
+                  {formatNumberWithCharSuffix(
+                    Number(
                       roundWeiAmount(
                         BigInt(flowRateToReceiver) * BigInt(SECONDS_IN_MONTH),
                         4,
                       ),
                     ),
+                    1,
                   )}
                 </Card.Text>
                 <Card.Text as="small" className="mt-1">
@@ -121,39 +122,42 @@ export default function DistributionPoolDetails(
         <Stack direction="vertical" gap={1} className="w-25">
           <Card.Text className="m-0 pe-0">You</Card.Text>
           <Badge className="bg-primary rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(
+            {formatNumberWithCharSuffix(
+              Number(
                 formatEther(
                   BigInt(userDistributionInfo?.flowRate ?? 0) *
                     BigInt(SECONDS_IN_MONTH),
-                ).slice(0, 8),
+                ),
               ),
+              1,
             )}
           </Badge>
         </Stack>
         <Stack direction="vertical" gap={1} className="w-25">
           <Card.Text className="m-0 pe-0">Others</Card.Text>
           <Badge className="bg-info rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(
+            {formatNumberWithCharSuffix(
+              Number(
                 formatEther(
                   (BigInt(gdaPool?.flowRate ?? 0) -
                     BigInt(userDistributionInfo?.flowRate ?? 0)) *
                     BigInt(SECONDS_IN_MONTH),
-                ).slice(0, 8),
+                ),
               ),
+              0,
             )}
           </Badge>
         </Stack>
         <Stack direction="vertical" gap={1} className="w-25">
           <Card.Text className="m-0 pe-0">All</Card.Text>
           <Badge className="bg-secondary rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(
+            {formatNumberWithCharSuffix(
+              Number(
                 formatEther(
                   BigInt(gdaPool?.flowRate ?? 0) * BigInt(SECONDS_IN_MONTH),
-                ).slice(0, 8),
+                ),
               ),
+              0,
             )}
           </Badge>
         </Stack>
@@ -164,27 +168,25 @@ export default function DistributionPoolDetails(
       <Stack direction="horizontal" gap={1} className="fs-6 p-2">
         <Stack direction="vertical" gap={1} className="w-25">
           <Badge className="bg-primary rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(formatEther(totalDistributedUser).slice(0, 8)),
+            {formatNumberWithCharSuffix(
+              Number(formatEther(totalDistributedUser)),
+              4,
             )}
           </Badge>
         </Stack>
         <Stack direction="vertical" gap={1} className="w-25">
           <Badge className="bg-info rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(
-                formatEther(totalDistributedAll - totalDistributedUser).slice(
-                  0,
-                  8,
-                ),
-              ),
+            {formatNumberWithCharSuffix(
+              Number(formatEther(totalDistributedAll - totalDistributedUser)),
+              4,
             )}
           </Badge>
         </Stack>
         <Stack direction="vertical" gap={1} className="w-25">
           <Badge className="bg-secondary rounded-1 p-1 text-start fs-6 fw-normal">
-            {formatNumberWithCommas(
-              parseFloat(formatEther(totalDistributedAll).slice(0, 8)),
+            {formatNumberWithCharSuffix(
+              Number(formatEther(totalDistributedAll)),
+              4,
             )}
           </Badge>
         </Stack>

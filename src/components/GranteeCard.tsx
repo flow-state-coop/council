@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatEther } from "viem";
 import { useAccount } from "wagmi";
 import { createVerifiedFetch } from "@helia/verified-fetch";
 import { useClampText } from "use-clamp-text";
@@ -11,7 +12,7 @@ import { CouncilMember } from "@/types/councilMember";
 import { Network } from "@/types/network";
 import useCouncil from "@/hooks/council";
 import { useMediaQuery } from "@/hooks/mediaQuery";
-import { roundWeiAmount } from "@/lib/utils";
+import { formatNumberWithCharSuffix } from "@/lib/utils";
 import { IPFS_GATEWAYS, SECONDS_IN_MONTH } from "@/lib/constants";
 
 type GranteeProps = {
@@ -72,7 +73,10 @@ export default function Grantee(props: GranteeProps) {
         allocation.grantee === granteeAddress,
     );
 
-  const monthlyFlow = roundWeiAmount(flowRate * BigInt(SECONDS_IN_MONTH), 4);
+  const monthlyFlow = formatNumberWithCharSuffix(
+    Number(formatEther(flowRate * BigInt(SECONDS_IN_MONTH))),
+    0,
+  );
 
   useEffect(() => {
     (async () => {

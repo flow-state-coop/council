@@ -11,6 +11,7 @@ import { Token } from "@/types/token";
 import { useMediaQuery } from "@/hooks/mediaQuery";
 import {
   TimeInterval,
+  formatNumberWithCharSuffix,
   fromTimeUnitsToSeconds,
   formatNumberWithCommas,
   roundWeiAmount,
@@ -156,8 +157,9 @@ export default function TopUp(props: TopUpProps) {
               </Card.Text>
               <Card.Text as="small" className="m-0">
                 Suggested{" "}
-                {formatNumberWithCommas(
-                  parseFloat(roundWeiAmount(suggestedTokenBalance, 6)),
+                {formatNumberWithCharSuffix(
+                  Number(roundWeiAmount(suggestedTokenBalance, 6)),
+                  1,
                 )}
               </Card.Text>
               <Button
@@ -255,13 +257,14 @@ export default function TopUp(props: TopUpProps) {
                           : "text-warning"
                     }`}
                   >
-                    {formatNumberWithCommas(
-                      parseFloat(
+                    {formatNumberWithCharSuffix(
+                      Number(
                         formatEther(
                           (underlyingTokenBalance?.value ?? BigInt(0)) +
                             superTokenBalance,
-                        ).slice(0, 8),
+                        ),
                       ),
+                      1,
                     )}
                     {hasSuggestedTokenBalance && (
                       <Image
@@ -274,8 +277,9 @@ export default function TopUp(props: TopUpProps) {
                   </Card.Text>
                   <Card.Text as="small" className="m-0">
                     Suggested{" "}
-                    {formatNumberWithCommas(
-                      parseFloat(roundWeiAmount(suggestedTokenBalance, 6)),
+                    {formatNumberWithCharSuffix(
+                      Number(roundWeiAmount(suggestedTokenBalance, 6)),
+                      1,
                     )}
                   </Card.Text>
                   <Button

@@ -19,21 +19,31 @@ export default function useGuildCheck(address: Address) {
 
     setIsCheckingGuild(true);
 
-    const guildClient = createGuildClient("SQF");
-    const { user: userClient } = guildClient;
+    try {
+      const guildClient = createGuildClient("SQF");
+      const { user: userClient } = guildClient;
 
-    const userMemberships = await userClient.getMemberships(address);
-    const guildMembership = userMemberships?.find(
-      (membership) => membership.guildId === GUILD_ID,
-    );
-    const hasRole =
-      guildMembership && guildMembership.roleIds.includes(ROLE_ID)
-        ? true
-        : false;
+      const userMemberships = await userClient.getMemberships(address);
+      const guildMembership = userMemberships?.find(
+        (membership) => membership.guildId === GUILD_ID,
+      );
+      const hasRole =
+        guildMembership && guildMembership.roleIds.includes(ROLE_ID)
+          ? true
+          : false;
 
-    setIsGuildMember(!!guildMembership);
-    setHasGuildRole(hasRole);
-    setIsCheckingGuild(false);
+      setIsGuildMember(!!guildMembership);
+      setHasGuildRole(hasRole);
+      setIsCheckingGuild(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.warn(`Guild: ${err.message}`);
+      } else {
+        console.error(err);
+      }
+
+      setIsCheckingGuild(false);
+    }
   }, [address]);
 
   useEffect(() => {

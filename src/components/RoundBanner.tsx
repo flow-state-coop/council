@@ -34,7 +34,7 @@ export default function PoolInfo(props: PoolInfoProps) {
     showDistributionPoolFunding,
   } = props;
 
-  const [showFullInfo, setShowFullInfo] = useState(false);
+  const [showFullInfo, setShowFullInfo] = useState(true);
 
   const { council } = useCouncil();
   const { isMobile } = useMediaQuery();
@@ -58,7 +58,10 @@ export default function PoolInfo(props: PoolInfoProps) {
   }, [showFullInfo]);
 
   return (
-    <div className="px-4 pt-5 round-banner-background">
+    <div
+      className="px-4 pt-5 round-banner-background"
+      style={{ maxWidth: "100vw" }}
+    >
       <Stack direction="vertical" className="pb-4">
         <Stack direction="horizontal" className="justify-content-between">
           <Stack direction="horizontal" gap={1}>
@@ -91,36 +94,36 @@ export default function PoolInfo(props: PoolInfoProps) {
             <Table borderless>
               <thead className="border-bottom border-dark">
                 <tr>
-                  <th className="w-33 ps-0 bg-transparent text-dark">
+                  <th className="w-25 ps-0 bg-transparent text-dark">
                     {isMobile ? "Token" : "Funding Token"}
                   </th>
-                  <th className="w-20 bg-transparent text-dark">
+                  <th className="w-25 bg-transparent text-dark">
                     {isMobile ? "Monthly" : "Monthly Flow"}
                   </th>
-                  <th className="w-20 bg-transparent text-dark">
+                  <th className="w-25 bg-transparent text-dark">
                     {isMobile ? "Total" : "Total Flow"}
                   </th>
-                  <th className="w-20 bg-transparent text-dark">Recipients</th>
+                  <th className="w-25 bg-transparent text-dark">Recipients</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td className="w-33 ps-0 bg-transparent">
+                  <td className="w-25 ps-0 bg-transparent">
                     {distributionTokenInfo.name}
                   </td>
-                  <td className="w-20 bg-transparent">
+                  <td className="w-25 bg-transparent">
                     {formatNumberWithCharSuffix(
                       Number(formatEther(distributionMonthly)),
                       0,
                     )}
                   </td>
-                  <td className="w-20 bg-transparent">
+                  <td className="w-25 bg-transparent">
                     {formatNumberWithCharSuffix(
                       Number(formatEther(distributionTotal)),
                       4,
                     )}
                   </td>
-                  <td className="w-20 bg-transparent">
+                  <td className="w-25 bg-transparent">
                     {council?.grantees?.length ?? 0}
                   </td>
                 </tr>
